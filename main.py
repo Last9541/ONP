@@ -1,0 +1,218 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
+import seaborn as sns
+
+df = pd.read_csv("games.csv")
+price = pd.to_numeric(df["Price"], errors="coerce").dropna()
+play_forever = pd.to_numeric(df["Average playtime forever"], errors="coerce").dropna()
+years = pd.to_datetime(df["Release date"], errors="coerce").dt.year.dropna().astype(int)
+owners = pd.Series(index=df.index, dtype=float)
+
+plt.figure(figsize=(8,5))
+
+plt.hist(price, bins=np.arange(0, 101, 5), color="skyblue", edgecolor="black")
+plt.xlim(0, 100)
+plt.yscale("log")
+plt.title("Distribucija cena igara")
+plt.xlabel("Cena")
+plt.ylabel("Broj igara")
+plt.show()
+
+plt.figure(figsize=(8,5))
+plt.hist(play_forever,  bins=np.arange(0, 101, 5), edgecolor="black")
+plt.yscale("log")
+plt.title("Distribucija prosecnog vremena igranja")
+plt.xlabel("Minuti")
+plt.ylabel("Broj igara")
+plt.show()
+
+by_year = years.value_counts().sort_index()
+plt.figure(figsize=(10,7))
+plt.bar(by_year.index.astype(str), by_year.values)
+plt.title("Broj izdatih igara po godini")
+plt.xlabel("Godina")
+plt.ylabel("Broj igara")
+plt.xticks(rotation=45, ha="right")
+plt.show()
+
+valid = df.copy()
+valid["Year"]  = pd.to_datetime(valid["Release date"], errors="coerce").dt.year
+valid["Price"] = pd.to_numeric(valid["Price"], errors="coerce")
+avg_price_year = valid.dropna(subset=["Year","Price"]).groupby("Year")["Price"].mean()
+plt.figure(figsize=(10,5))
+plt.plot(avg_price_year.index.astype(int), avg_price_year.values, marker="o")
+plt.title("Prosecna cena po godini")
+plt.xlabel("Godina")
+plt.ylabel("Prosecna cena")
+plt.show()
+
+x = pd.to_numeric(df["Price"], errors="coerce")
+index=0
+for c in df["Estimated owners"]:
+    num = c.split("-")
+    owners[index]=((float(num[0].strip())+float(num[1].strip()))/2)
+    index+=1
+mask = x.notna() & owners.notna()
+plt.figure(figsize=(8,5))
+plt.scatter(x[mask], owners[mask], alpha=0.5)
+plt.title("Cena vs Estimated owners")
+plt.xlabel("Cena")
+plt.ylabel("Estimated owners")
+plt.yscale("log")
+plt.show()
+
+y = pd.to_numeric(df["Peak CCU"], errors="coerce")
+m = x.notna() & y.notna()
+plt.figure(figsize=(8,5))
+plt.scatter(x[m], y[m], alpha=0.5)
+plt.title("Cena vs Peak CCU")
+plt.xlabel("Cena")
+plt.ylabel("Peak CCU")
+plt.yscale("log")
+plt.show()
+
+us = pd.to_numeric(df["User score"], errors="coerce").dropna()
+plt.figure(figsize=(8,5))
+plt.hist(us, bins=40, edgecolor="black")
+plt.title("Distribucija user scora")
+plt.xlabel("Ocena")
+plt.ylabel("Broj igara")
+plt.yscale("log")
+plt.show()
+
+us = pd.to_numeric(df["User score"], errors="coerce").replace(0,np.nan).dropna()
+plt.figure(figsize=(8,5))
+plt.hist(us, bins=np.arange(0, 101, 5), edgecolor="black")
+plt.title("Distribucija user scora")
+plt.xlabel("Ocena")
+plt.ylabel("Broj igara")
+plt.show()
+
+mc = pd.to_numeric(df["Metacritic score"], errors="coerce").dropna()
+plt.figure(figsize=(8,5))
+plt.hist(mc, bins=40, edgecolor="black")
+plt.title("Distribucija metacritic scora")
+plt.xlabel("Ocena")
+plt.ylabel("Broj igara")
+plt.yscale("log")
+plt.show()
+
+mc = pd.to_numeric(df["Metacritic score"], errors="coerce").replace(0,np.nan).dropna()
+plt.figure(figsize=(8,5))
+plt.hist(mc, bins=np.arange(0, 101, 5), edgecolor="black")
+plt.title("Distribucija metacritic scora")
+plt.xlabel("Ocena")
+plt.ylabel("Broj igara")
+plt.show()
+
+tmp = df[["Genres","User score"]].dropna(subset=["Genres"])
+tmp["User score"] = pd.to_numeric(tmp["User score"], errors="coerce")
+tmp = tmp.dropna(subset=["User score"])
+g = (tmp.assign(Genres=tmp["Genres"].astype(str).str.split(","))
+             .explode("Genres"))
+g["Genres"] = g["Genres"].str.strip()
+mean_by_genre = (g.groupby("Genres")["User score"]
+                       .mean()
+                       .sort_values(ascending=False)
+                       )
+
+
+top_10=mean_by_genre.head(10)
+plt.figure(figsize=(10,12))
+plt.bar(top_10.index, top_10.values)
+plt.title("Top 10 prosecnih ocena po zanru")
+plt.xlabel("Zanr")
+plt.ylabel("Prosek ocene")
+plt.xticks(rotation=45, ha="right")
+plt.show()
+
+top_10=mean_by_genre.iloc[2:].head(10)
+plt.figure(figsize=(10,12))
+plt.bar(top_10.index, top_10.values)
+plt.title("Top 10 prosecnih ocena po zanru (bez sexual contenta)")
+plt.xlabel("Zanr")
+plt.ylabel("Prosek ocene")
+plt.xticks(rotation=45, ha="right")
+plt.show()
+
+s = (df["Genres"].dropna().astype(str)
+           .str.split(",").explode().str.strip())
+cnt = s[s.ne("")].value_counts().head(10)
+plt.figure(figsize=(10,15))
+plt.bar(cnt.index, cnt.values)
+plt.title("Top 10 zanrova")
+plt.xlabel("Zanr")
+plt.ylabel("Broj igara")
+plt.xticks(rotation=45, ha="right")
+plt.show()
+
+s = (df["Tags"].dropna().astype(str)
+     .str.split(",").explode().str.strip())
+cnt = s.value_counts().head(10)
+plt.figure(figsize=(10, 15))
+plt.bar(cnt.index, cnt.values)
+plt.title("Top 10 tagova")
+plt.xlabel("Tag")
+plt.ylabel("Broj igara")
+plt.xticks(rotation=45, ha="right")
+plt.show()
+
+platform_cols = [c for c in ["Windows","Mac","Linux"] if c in df.columns]
+vals = []
+labs = []
+for c in platform_cols:
+    col = df[c]
+    vals.append(col.sum())
+    labs.append(c)
+
+plt.figure(figsize=(6,4))
+plt.bar(labs, vals)
+plt.title("Podrska po platformama")
+plt.xlabel("Platforma")
+plt.ylabel("Broj igara")
+plt.show()
+
+pos = pd.to_numeric(df["Positive"], errors="coerce").fillna(0)
+neg = pd.to_numeric(df["Negative"], errors="coerce").fillna(0)
+ratio = (pos / (pos + neg)).replace([np.inf, -np.inf], np.nan)
+mask = ratio.notna() & owners.notna()
+plt.figure(figsize=(8,5))
+plt.scatter(ratio[mask], owners[mask], alpha=0.5)
+plt.title("Review ratio vs Estimated owners")
+plt.xlabel("Review ratio")
+plt.ylabel("Estimated owners")
+plt.yscale("log")
+plt.show()
+
+num_lang = (df["Supported languages"].fillna("")
+                  .astype(str)
+                  .apply(lambda s: len([t for t in s.split(",")])))
+
+plt.figure(figsize=(8,5))
+plt.hist(num_lang, bins=40, edgecolor="black")
+plt.title("Broj podrzanih jezika po igri")
+plt.xlabel("Broj jezika")
+plt.ylabel("Broj igara")
+plt.yscale("log")
+plt.show()
+
+pos = pd.to_numeric(df["Positive"], errors="coerce").fillna(0)
+neg = pd.to_numeric(df["Negative"], errors="coerce").fillna(0)
+tot = pos + neg
+ratio = (pos / tot).replace([np.inf, -np.inf], np.nan)
+x = tot
+y = ratio
+m = x.notna() & y.notna() & (x > 0)
+bins = np.logspace(np.log10(x[m].min()), np.log10(x[m].max()), 20)
+cat = pd.cut(x[m], bins=bins, include_lowest=True)
+bin_x = x[m].groupby(cat,observed=True).median()
+bin_y = y[m].groupby(cat,observed=True).median()
+plt.figure(figsize=(8,5))
+plt.xscale("log")
+plt.plot(bin_x.values, bin_y.values, linewidth=2, marker="o")
+plt.title("Odnos pozitivnih i ukupnih recenzija")
+plt.xlabel("Ukupan broj recenzija")
+plt.ylabel("Udeo pozitivnih recenzija")
+plt.show()
