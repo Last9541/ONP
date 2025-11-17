@@ -1,0 +1,38 @@
+1. Problemi sa nedostajućim vrednostima
+
+U tabeli se pojavljivala jedna kolona sa nedostajućim vrednostima: Primary_genre.
+Sve numeričke kolone su bile kompletne (bez NaN vrednosti). Nedostajuće vrednosti zamenjene su kategorijom "Unknown", pošto
+je primary_genre kategorijska promenljiva i ne postoji numerički način popunjavanja (kao što je medijana).
+Korišćenje "Unknown" omogućava da model nauči da se ponaša prema igrama bez jasno definisanog žanra.
+Ovo je bolja opcija od brisanja redova jer dataset ima mnogo instanci, a gubitak podataka značajno smanjuje kvalitet kasnijeg modela.
+
+2. Problemi sa ekstremnim vrednostima (outliers)
+
+Kolone Price, Peak CCU, DLC count i Owners_mid imaju ekstremne outliere.
+Oni se ne uklanjaju iz dataset-a (da se ne bi uništila realna distribucija igara), ali:
+Za vizuelizacije (histrogrami) gore 1% najekstremnijih vrednosti se privremeno uklanja, zbog čitljivosti.
+
+4. Smanjivanje dimenzionalnosti (PCA) – zašto i kako
+
+PCA je primenjen nad skaliranim numeričkim podacima.
+-da se proveri struktura podataka
+-da se vidi da li postoji mali broj komponenti koje nose većinu informacija
+
+PC1 i PC2 objašnjavaju ~79% ukupne varijanse
+prvih 3 komponente objašnjavaju ~90%
+Dataset ima jaku strukturu i mnoge numeričke kolone su međusobno zavisne (visoka korelacija Peak CCU ↔ Owners_mid).
+
+5. Opšti zaključci o podacima
+
+Dataset sadrži veliki broj igara, većina igara ima:
+-veoma nizak broj vlasnika
+-niske cene
+-nula ili 1 DLC
+-zahtevan uzrast obično 0 ili 17
+
+Distribucije numeričkih promenljivih su:
+-ekstremno asimetrične (right-skewed)
+-imaju long-tail strukturu (log-normalno ponašanje)
+
+Kategorijska promenljiva Primary_genre ima oko 50% vrednosti iz "Indie" + "Action" + "Adventure".
+Outlieri nisu uklanjani jer predstavljaju realne popularne igre (CS:GO, Dota, PUBG…).
