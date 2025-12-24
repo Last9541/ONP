@@ -1,0 +1,35 @@
+Faza 5:
+
+Linearna regresija uspešno opisuje opšti trend rasta popularnosti u zavisnosti od ulaznih atributa,
+ali pokazuje ograničenja u preciznom modelovanju ekstremno popularnih i nepopularnih igara,
+što je očekivano s obzirom na nelinearnu prirodu tržišnih podataka.
+
+Logistička regresija ostvaruje stabilne i konzistentne rezultate,
+ali zbog linearne granice odlučivanja pokazuje ograničenu sposobnost razdvajanja složenijih obrazaca.
+
+SVM model postiže bolje rezultate u pogledu tačnosti, odziva i F1-mere od logističke regresije.
+Zahvaljujući principu maksimalne margine, SVM efikasno razdvaja igre različite popularnosti i ostvaruje
+pouzdanije razdvajanje klasa u odnosu na logističku regresiju.
+
+Faza 6:
+
+U poređenju sa stablom odlučivanja, MLP ostvaruje bolje rezultate u pogledu tačnosti, odziva i F1-mere,
+što ukazuje na njegovu sposobnost da modeluje složene nelinearne odnose između ulaznih atributa, zahvaljujući
+učenju kroz nekoliko skrivenih slojeva i primeni odgovarajućih aktivacionih funkcija.
+
+Stablo odlučivanja pokazuje slabije performanse od MLP-a zbog ograničene fleksibilnosti
+u modelovanju kompleksnih zavisnosti, budući da se odluke zasnivaju na sekvencijalnim,
+diskretnim podelama prostora atributa, što otežava reprezentaciju složenih nelinearnih granica odlučivanja.
+
+K-Means algoritam je uspešno identifikovao klastere igara na osnovu svih izdvojenih atributa.
+Klasteri odgovaraju igrama niske, srednje i visoke popularnosti,
+što ukazuje da se igre prirodno grupišu prema tržišnoj poziciji i interesovanju korisnika.
+
+
+Faza 7:
+LSTM model je uspešniji od SARIMAX-a jer je u stanju da uči nelinearne zavisnosti i kompleksne obrasce
+iz sekvenci prethodnih vrednosti pomoću kliznog prozora.
+
+SARIMAX, kao linearni statistički model bez egzogenih varijabli, efikasno hvata dugoročni trend,
+ali proizvodi prognoze bez izraženih oscilacija i slabije reaguje na nagle promene.
+Zbog toga LSTM postiže manju grešku (RMSE) i bolje prati realno kretanje cene.
