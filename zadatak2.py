@@ -6,21 +6,9 @@ from sklearn.decomposition import PCA
 
 
 
-def scale_standard(df, columns):
+def scale_standard(X_train,X_test):
     scaler = StandardScaler()
-    return scaler.fit_transform(df[columns]), scaler
-
-def normalize_minmax(df, columns):
-    scaler = MinMaxScaler()
-    return scaler.fit_transform(df[columns]), scaler
-
-def normalize_l2(df, columns):
-    norm = Normalizer(norm='l2')
-    return norm.fit_transform(df[columns])
-
-def normalize_l1(df, columns):
-    norm = Normalizer(norm='l1')
-    return norm.fit_transform(df[columns])
+    return scaler.fit_transform(X_train),scaler.transform(X_test),scaler
 
 
 def parse_owners(s):
