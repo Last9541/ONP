@@ -2,7 +2,7 @@ from scipy import stats
 import zadatak2
 
 df = zadatak2.prepare_games_df()
-print("HIPOTEZA 3 - Da li su igre za odrasle (18+)")
+print("HIPOTEZA 3 – Razlika u cenama između 18+ i non-adult igara")
 age = df["Required age"]
 prices = df["Price"]
 
